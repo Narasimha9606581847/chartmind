@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ChartMind AI — History</title>
+  <link rel="stylesheet" href="style.css?v=2" />
+  <style>
+    .history-list{max-width:900px;margin:24px auto;padding:0 16px}
+    .history-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee}
+    .history-item .text{flex:1;margin-right:12px}
+    .history-meta{color:#666;font-size:0.9rem}
+    .controls{max-width:900px;margin:12px auto;display:flex;gap:12px;padding:0 16px}
+    .btn{padding:8px 12px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer}
+    .btn.danger{border-color:#e55;background:#fee}
+  </style>
+</head>
+<body>
+  <div class="app fade-in">
+    <main class="main-container">
+      <header class="topbar slide-down">
+        <div class="header-content">
+          <h1 class="title">Conversation History</h1>
+          <p class="description">Saved searches & chats</p>
+        </div>
+      </header>
+
+      <div class="controls">
+        <button id="btn-clear" class="btn danger">Clear History</button>
+        <a href="index.html" class="btn">Back to Chat</a>
+      </div>
+
+      <section class="content history-list" id="history-list">
+        <!-- history items injected here -->
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js?v=2"></script>
+  <script>
+    const listEl = document.getElementById('history-list');
+    const btnClear = document.getElementById('btn-clear');
+
+    function fmtTime(iso){
+      try{
+        const d = new Date(iso);
+        return d.toLocaleString();
+      }catch(e){ return iso || ''; }
+    }
+
+    function load(){
+      const raw = localStorage.getItem('calmai_sessions') || '[]';
+      let sessions = [];
+      try{ sessions = JSON.parse(raw); } catch(e){ sessions = []; }
+
+      if(sessions.length === 0){
+        listEl.innerHTML = '<p>No conversations yet — start chatting to save sessions here.</p>';
+        return;
+      }
+
+      listEl.innerHTML = '';
+      // show most recent sessions first
+      sessions.slice().reverse().forEach(session => {
+        const row = document.createElement('div');
+        row.className = 'history-item';
+
+        const previewText = session.messages.length ? session.messages.find(m => m.role === 'user')?.content || session.messages[0].content : '(empty)';
+        const lastMsg = session.messages[session.messages.length - 1];
+
+        const text = document.createElement('div');
+        text.className = 'text';
+        text.textContent = previewText;
+
+        const meta = document.createElement('div');
+        meta.className = 'history-meta';
+        meta.innerHTML = `<div>${fmtTime(session.createdAt)} — ${lastMsg ? lastMsg.role : ''}</div>
+                          <div style="margin-top:6px">
+                            <button class='btn open' data-id='${session.id}'>Open</button>
+                            <button class='btn delete' data-id='${session.id}'>Delete</button>
+                          </div>`;
+
+        row.appendChild(text);
+        row.appendChild(meta);
+        listEl.appendChild(row);
+      });
+
+      // wire open buttons
+      listEl.querySelectorAll('button.open').forEach(b => b.addEventListener('click', (e)=>{
+        const id = e.currentTarget.dataset.id;
+        localStorage.setItem('calmai_selected_session', id);
+        window.location.href = 'index.html';
+      }));
+
+      // wire delete buttons
+      listEl.querySelectorAll('button.delete').forEach(b => b.addEventListener('click', (e)=>{
+        const id = e.currentTarget.dataset.id;
+        if(!confirm('Delete this conversation?')) return;
+        let sessions = [];
+        try{ sessions = JSON.parse(localStorage.getItem('calmai_sessions') || '[]'); } catch(e){ sessions = []; }
+        sessions = sessions.filter(s => s.id !== id);
+        localStorage.setItem('calmai_sessions', JSON.stringify(sessions));
+        load();
+      }));
+    }
+
+    btnClear.addEventListener('click', ()=>{
+      if(confirm('Clear all history?')){
+        localStorage.removeItem('calmai_history');
+        load();
+      }
+    });
+
+    load();
+  </script>
+</body>
+</html>

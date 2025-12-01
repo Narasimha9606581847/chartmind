@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ChartMind AI — Settings</title>
+  <link rel="stylesheet" href="style.css?v=2" />
+  <style>
+    .settings{max-width:820px;margin:20px auto;padding:16px}
+    .field{margin-bottom:12px}
+    label{display:block;font-weight:600;margin-bottom:6px}
+    input[type=range]{width:100%}
+    .row{display:flex;gap:12px;align-items:center}
+    .btn{padding:8px 12px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer}
+    .danger{background:#fdd;border-color:#e55}
+  </style>
+</head>
+<body>
+  <div class="app fade-in">
+    <main class="main-container">
+      <header class="topbar slide-down">
+        <div class="header-content">
+          <h1 class="title">Settings</h1>
+          <p class="description">Customize ChartMind AI</p>
+        </div>
+      </header>
+
+      <section class="content settings">
+        <div class="field">
+          <label for="theme">Theme</label>
+          <select id="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="model">Model</label>
+          <select id="model">
+            <option value="gpt-default">gpt-default</option>
+            <option value="gpt-advanced">gpt-advanced</option>
+          </select>
+        </div>
+
+        <!-- Temperature removed per user request -->
+
+        <div class="field">
+          <label><input id="voiceToggle" type="checkbox"> Enable voice responses</label>
+        </div>
+
+        <div class="row" style="margin-top:16px">
+          <button id="btnSave" class="btn">Save</button>
+          <button id="btnExport" class="btn">Export Sessions</button>
+          <button id="btnImport" class="btn">Import Sessions</button>
+          <button id="btnClearAll" class="btn danger">Clear All Conversations</button>
+          <a href="index.html" class="btn">Back</a>
+        </div>
+
+        <input id="importFile" type="file" accept="application/json" style="display:none" />
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const themeEl = document.getElementById('theme');
+    const modelEl = document.getElementById('model');
+    const voiceEl = document.getElementById('voiceToggle');
+    const btnSave = document.getElementById('btnSave');
+    const btnExport = document.getElementById('btnExport');
+    const btnImport = document.getElementById('btnImport');
+    const btnClearAll = document.getElementById('btnClearAll');
+    const importFile = document.getElementById('importFile');
+
+    function loadSettings(){
+      try{ return JSON.parse(localStorage.getItem('calmai_settings') || '{}'); } catch(e){ return {}; }
+    }
+
+    function saveSettings(s){
+      localStorage.setItem('calmai_settings', JSON.stringify(s));
+    }
+
+    function applyTheme(value){
+      if(value === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    }
+
+    // populate
+    const s = loadSettings();
+    if(s.theme) themeEl.value = s.theme;
+    if(s.model) modelEl.value = s.model;
+    if(typeof s.voice !== 'undefined') voiceEl.checked = !!s.voice;
+    // temperature removed
+    applyTheme(themeEl.value);
+
+    // temperature removed
+
+    // live preview of theme when user changes the select
+    themeEl.addEventListener('change', ()=> applyTheme(themeEl.value));
+
+    btnSave.addEventListener('click', ()=>{
+      const settings = { theme: themeEl.value, model: modelEl.value, voice: voiceEl.checked };
+      saveSettings(settings);
+      applyTheme(settings.theme);
+      alert('Settings saved');
+    });
+
+    btnExport.addEventListener('click', ()=>{
+      const data = localStorage.getItem('calmai_sessions') || '[]';
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'calmai_sessions.json';
+      document.body.appendChild(a); a.click(); a.remove();
++      URL.revokeObjectURL(url);
+    });
+
+    btnImport.addEventListener('click', ()=> importFile.click());
+    importFile.addEventListener('change', (e)=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      const r = new FileReader();
+      r.onload = ()=>{
+        try{
+          const obj = JSON.parse(r.result);
+          localStorage.setItem('calmai_sessions', JSON.stringify(obj));
+          alert('Imported sessions');
+        }catch(err){ alert('Invalid file'); }
+      };
+      r.readAsText(f);
+    });
+
+    btnClearAll.addEventListener('click', ()=>{
+      if(confirm('Delete all saved conversations? This cannot be undone.')){
+        localStorage.removeItem('calmai_sessions');
+        alert('All conversations deleted');
+      }
+    });
+  </script>
+</body>
+</html>

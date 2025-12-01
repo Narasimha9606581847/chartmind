@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ChartMind AI – Your Personal BRO....</title>
+  <link rel="stylesheet" href="style.css?v=2" />
+</head>
+<body>
+  <div class="app fade-in">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-main glow">🧠</div>
+        <h2>ChartMind AI</h2>
+      </div>
+      
+      <nav class="nav-menu">
+        <button id="new-chat-btn" class="nav-item active">
+          <span class="icon">💬</span>
+          <span>New Chat</span>
+        </button>
+        <a href="history.html" class="nav-item">
+          <span class="icon">📁</span>
+          <span>History</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+          <span class="icon">⚙️</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="pro.html" class="nav-item accent" role="button">
+          <span class="icon">✨</span>
+          <span>Pro Plan</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <main class="main-container">
+      <!-- Header -->
+      <header class="topbar slide-down">
+        <div class="header-content">
+          <h1 class="title">ChartMind AI</h1>
+          <p class="description">Your personal study Buddy...!</p>
+        </div>
+
+        <div class="actions">
+          <button id="btn-reset" class="icon-btn" title="Clear chat">
+            <span>🗑️</span>
+          </button>
+          <button id="voiceBtn" class="icon-btn" title="Voice input">
+            <span>🎤</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Chat Container -->
+      <section class="chat-container">
+        <div class="chat" id="chat">
+          <div class="empty-state">
+            <div class="empty-icon">💭</div>
+            <h3>Start a conversation</h3>
+            <p>Ask me anything,how you're feeling</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Input Area -->
+      <section class="composer slide-up">
+        <form id="chat-form" class="chat-form">
+          <div class="input-wrapper">
+            <input
+              id="chat-input"
+              type="text"
+              placeholder="Tell me how you feel…"
+              autocomplete="off"
+            />
+            <button id="send-btn" type="submit" class="send-icon">
+              <span>⬆️</span>
+            </button>
+          </div>
+          <div class="input-footer">
+            <p class="text-xs">ChartMind AI can help with wellness, meditation, and more</p>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js?v=2"></script>
+</body>
+</html>
