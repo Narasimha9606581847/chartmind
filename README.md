@@ -41,3 +41,7 @@ Other Tools
 JSON for data formatting
 
 Fetch API for frontend-backend communication
+
+
+<img width="1366" height="622" alt="image" src="https://github.com/user-attachments/assets/9833f435-1492-4c8f-b50b-8ebbf9fc1d85" />
+
